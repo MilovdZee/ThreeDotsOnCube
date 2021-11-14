@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flat Cube Draw</title>
+</head>
+<body>
+<canvas width="1200" height="800" id="my_Canvas" style="border: 1px solid blue;"></canvas>
+
+<script type="application/javascript">
+    const cubeSize = 130;
+    const pixelSize = 1;
+
+    const transformations = [
+        [(x, y) => transform(x, y, 14, 180), (x, y) => transform(x, y, 24, 0)], // 0
+        [(x, y) => transform(x, y, 15, 180), (x, y) => transform(x, y, 25, 0)], // 1
+        [(x, y) => transform(x, y, 16, 180), (x, y) => transform(x, y, 26, 0)], // 2
+        [], [], [],
+        [(x, y) => transform(x, y, 7, 90), (x, y) => transform(x, y, 8, 180), (x, y) => transform(x, y, 9, 270), (x, y) => transform(x, y, 10, 0), (x, y) => transform(x, y, 11, 90)], // 6
+        [],
+        [(x, y) => transform(x, y, 6, 180), (x, y) => transform(x, y, 7, 270), (x, y) => transform(x, y, 9, 90), (x, y) => transform(x, y, 10, 180), (x, y) => transform(x, y, 11, 270)], // 8
+        [(x, y) => transform(x, y, 6, 90), (x, y) => transform(x, y, 7, 180), (x, y) => transform(x, y, 8, 270), (x, y) => transform(x, y, 10, 90), (x, y) => transform(x, y, 11, 180)], // 9
+        [(x, y) => transform(x, y, 6, 0), (x, y) => transform(x, y, 7, 90), (x, y) => transform(x, y, 8, 180), (x, y) => transform(x, y, 9, 270), (x, y) => transform(x, y, 11, 90)], // 10
+        [(x, y) => transform(x, y, 6, 270), (x, y) => transform(x, y, 7, 0), (x, y) => transform(x, y, 8, 90), (x, y) => transform(x, y, 9, 180), (x, y) => transform(x, y, 10, 270)], // 11
+        [(x, y) => transform(x, y, 16, 0), (x, y) => transform(x, y, 2, 180), (x, y) => transform(x, y, 26, 180)], // 12
+        [], [], [], [],
+        [(x, y) => transform(x, y, 13, 0)], // 17
+        [(x, y) => transform(x, y, 19, 270), (x, y) => transform(x, y, 20, 0), (x, y) => transform(x, y, 21, 90), (x, y) => transform(x, y, 22, 180), (x, y) => transform(x, y, 23, 270)], // 18
+        [],
+        [(x, y) => transform(x, y, 18, 180), (x, y) => transform(x, y, 19, 90), (x, y) => transform(x, y, 21, 270), (x, y) => transform(x, y, 22, 180), (x, y) => transform(x, y, 23, 90)], // 20
+        [(x, y) => transform(x, y, 18, 270), (x, y) => transform(x, y, 19, 180), (x, y) => transform(x, y, 20, 90), (x, y) => transform(x, y, 22, 270), (x, y) => transform(x, y, 23, 180)], // 21
+        [(x, y) => transform(x, y, 18, 0), (x, y) => transform(x, y, 19, 270), (x, y) => transform(x, y, 20, 180), (x, y) => transform(x, y, 21, 90), (x, y) => transform(x, y, 23, 270)], // 22
+        [(x, y) => transform(x, y, 18, 90), (x, y) => transform(x, y, 19, 0), (x, y) => transform(x, y, 20, 270), (x, y) => transform(x, y, 21, 180), (x, y) => transform(x, y, 22, 90)], // 23
+        [(x, y) => transform(x, y, 14, 180), (x, y) => transform(x, y, 0, 0)], // 24
+        [(x, y) => transform(x, y, 15, 180), (x, y) => transform(x, y, 1, 0)], // 25
+        [(x, y) => transform(x, y, 16, 180), (x, y) => transform(x, y, 2, 0)], // 26
+        [], [], []
+    ];
+
+    const canvas = document.getElementById("my_Canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "blue";
+
+    drawGrid();
+    drawFlatCube();
+
+    drawCircle(2.5, 3, Math.sqrt(8) / 2, 'red');
+    drawCircle(2, 3.5, Math.sqrt(8) / 2, 'red');
+
+    drawCircle(3.5, 2, Math.sqrt(8) / 2, 'green');
+    drawCircle(1.5, 1, Math.sqrt(8) / 2, 'green');
+    drawCircle(3, 1.5, Math.sqrt(8) / 2, 'green');
+
+    drawCircle(5, 2.5, Math.sqrt(8) / 2, 'blue');
+    drawCircle(1, 2.5, Math.sqrt(8) / 2, 'blue');
+
+    //drawCheckLInes(26);
+
+    function transform(x, y, targetRect, degrees) {
+        let transformedX;
+        let transformedY;
+        switch (degrees) {
+            case 0:
+                transformedX = x % 1;
+                transformedY = y % 1;
+                break;
+            case 90:
+                transformedX = 1 - y % 1;
+                transformedY = x % 1;
+                break;
+            case 180:
+                transformedX = 1 - x % 1;
+                transformedY = 1 - y % 1;
+                break;
+            case 270:
+                transformedX = y % 1;
+                transformedY = 1 - x % 1;
+                break;
+        }
+
+        let targetRectX = targetRect % 6;
+        let targetRectY = Math.floor(targetRect / 6);
+
+        transformedX = transformedX + targetRectX;
+        transformedY = transformedY + targetRectY;
+
+        return [transformedX, transformedY];
+    }
+
+    function drawCheckLInes(square) {
+        let x = square % 6;
+        let y = Math.floor(square / 6);
+        drawLine(x, y, x + .5, y + .5, 'red');
+        drawLine(x + 1, y, x + .5, y + .5, 'green');
+    }
+
+    function drawLine(x1, y1, x2, y2, color) {
+        const steps = 50;
+        let x = x1;
+        let y = y1;
+        for (let step = 0; step < steps; step++) {
+            drawPixel(x, y, color);
+            x = x1 + step * (x2 - x1) / steps;
+            y = y1 + step * (y2 - y1) / steps;
+        }
+    }
+
+    function drawCircle(centerX, centerY, radius, color) {
+        const points = 360;
+        for (let angle = 0.0; angle < 360 / 2 / Math.PI; angle += 2 * Math.PI / points) {
+            let x = centerX + .5 * radius * Math.cos(angle);
+            let y = centerY + .5 * radius * Math.sin(angle);
+            drawPixel(x, y, color);
+        }
+    }
+
+    var seenPixelTransformations;
+
+    function drawPixel(x, y, color) {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        seenPixelTransformations = [];
+        drawPixelRecursive(x, y, color);
+        ctx.stroke();
+    }
+
+    function drawPixelRecursive(x, y, color) {
+        if (x >= 6) x -= .0001; // safety
+        if (y >= 5) y -= .0001; // safety
+
+        let square = getSquare(x, y);
+        let transformationFunctions = transformations[square];
+        ctx.fillRect(x * cubeSize + .5 * cubeSize, y * cubeSize + .5 * cubeSize, pixelSize, pixelSize);
+        for (let i = 0; i < transformationFunctions.length; i++) {
+            let pixelTransformationKey = square + ',' + i + ',' + x + ',' + y;
+            if (seenPixelTransformations[pixelTransformationKey]) return;
+            seenPixelTransformations[pixelTransformationKey] = true;
+
+            let transformationFunction = transformationFunctions[i];
+            let [newX, newY] = transformationFunction(x, y);
+            drawPixelRecursive(newX, newY, color);
+        }
+    }
+
+    function getSquare(x, y) {
+        let floorX = Math.floor(x);
+        let floorY = Math.floor(y);
+        return floorX + floorY * 6;
+    }
+
+    function drawRect(x, y) {
+        ctx.rect(x * cubeSize + .5 * cubeSize, y * cubeSize + .5 * cubeSize, cubeSize, cubeSize);
+    }
+
+    function drawText(x, y, text) {
+        ctx.fillText(text, x * cubeSize + .5 * cubeSize + 2, y * cubeSize + .5 * cubeSize + 12);
+    }
+
+    function drawGrid() {
+        ctx.beginPath();
+        ctx.strokeStyle = "yellow";
+        let rectNo = 0;
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 6; x++) {
+                drawRect(x, y);
+                drawText(x, y, rectNo + ': ' + x + ', ' + y);
+                rectNo++;
+            }
+        }
+        ctx.stroke();
+    }
+
+    function drawFlatCube() {
+        const centers = [
+            [1, 2],
+            [2, 2],
+            [3, 2],
+            [4, 2],
+            [1, 3],
+            [1, 1]
+        ];
+        ctx.beginPath();
+        ctx.strokeStyle = "green";
+        centers.forEach(center => drawRect(center[0], center[1]));
+        ctx.stroke();
+    }
+</script>
+</body>
+</html>
